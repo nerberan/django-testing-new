@@ -4,18 +4,11 @@ import pytest
 from django.urls import reverse
 
 
-@pytest.mark.parametrize(
-    'url_name, args',
-    (
-        ('news:home', None),
-        ('news:detail', 'news_pk'),
-        ('users:login', None),
-        ('users:signup', None),
-    ),
-)
-def test_public_pages_available_for_anonymous(
-    client, news_item, url_name, args
-):
+@pytest.mark.parametrize('url_name, args', (('news:home', None),
+                                            ('news:detail', 'news_pk'),
+                                            ('users:login', None),
+                                            ('users:signup', None),))
+def test_pages_available_for_anonym(client, news_item, url_name, args):
     if args == 'news_pk':
         url = reverse(url_name, args=[news_item.pk])
     else:
@@ -25,31 +18,22 @@ def test_public_pages_available_for_anonymous(
     assert response.status_code == HTTPStatus.OK
 
 
-@pytest.mark.parametrize(
-    'url_name',
-    ('news:edit', 'news:delete'),
-)
-def test_author_can_access_edit_and_delete(author_client, comment, url_name):
-    """Автор комментария получает 200 на edit и delete."""
+@pytest.mark.parametrize('url_name', ('news:edit', 'news:delete'))
+def test_author_can_edit_and_delete(author_client, comment, url_name):
     url = reverse(url_name, args=[comment.pk])
     response = author_client.get(url)
     assert response.status_code == HTTPStatus.OK
 
 
 @pytest.mark.parametrize('url_name', ('news:edit', 'news:delete'))
-def test_other_user_gets_404_for_foreign_comment(
-    other_client, comment, url_name
-):
+def test_other_user_gets_404_for_comment(other_client, comment, url_name):
     url = reverse(url_name, args=[comment.pk])
     response = other_client.get(url)
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
-@pytest.mark.parametrize(
-    'url_name',
-    ('news:edit', 'news:delete'),
-)
-def test_anonymous_redirected_to_login_with_next(client, comment, url_name):
+@pytest.mark.parametrize('url_name', ('news:edit', 'news:delete'))
+def test_anonym_redirected_to_login(client, comment, url_name):
     url = reverse(url_name, args=[comment.pk])
     response = client.get(url)
     assert response.status_code == HTTPStatus.FOUND

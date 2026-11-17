@@ -66,17 +66,17 @@ def many_news(db):
 def comments_with_different_dates(db, news_item, author):
     now = timezone.now()
     comments = []
-    for i in range(3):
-        c = Comment.objects.create(
+    for i in range(4):
+        comment = Comment.objects.create(
             news=news_item,
             author=author,
-            text=f'Комментарий {i}',
+            text=f'Тестовый комментарий {i}',
         )
 
-        Comment.objects.filter(pk=c.pk).update(
+        Comment.objects.filter(pk=comment.pk).update(
             created=now - timezone.timedelta(days=i)
         )
-        comments.append(c)
+        comments.append(comment)
     return comments
 
 

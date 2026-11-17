@@ -9,7 +9,7 @@ BAD_WORD = 'редиска'
 BAD_WORD_ERROR = 'Не ругайтесь!'
 
 
-def test_anonymous_cannot_create_comment(client, news_item):
+def test_anonym_cannot_create_comment(client, news_item):
     url = reverse('news:detail', args=[news_item.pk])
     before = Comment.objects.count()
     data = {'text': 'Текст от анонима'}
@@ -19,10 +19,10 @@ def test_anonymous_cannot_create_comment(client, news_item):
     assert Comment.objects.count() == before
 
 
-def test_author_creates_one_comment(author_client, author, news_item):
+def test_author_creates_comment(author_client, author, news_item):
     url = reverse('news:detail', args=[news_item.pk])
     before = Comment.objects.count()
-    text = 'Новый комментарий'
+    text = 'Новый тестовый комментарий'
     response = author_client.post(url, data={'text': text})
     assert response.status_code == HTTPStatus.FOUND
     assert response.url.endswith('#comments')
@@ -41,7 +41,7 @@ def test_author_creates_one_comment(author_client, author, news_item):
         ('news:delete', 'post', 'comment'),
     ),
 )
-def test_redirect_to_comments_anchor(
+def test_redirect_to_comments(
     author_client, news_item, comment, url_name, method, args_from
 ):
     obj = news_item if args_from == 'news' else comment
@@ -52,7 +52,7 @@ def test_redirect_to_comments_anchor(
     assert response.url.endswith('#comments')
 
 
-def test_bad_word_comment_not_saved(author_client, author, news_item):
+def test_bad_word_comment(author_client, author, news_item):
     url = reverse('news:detail', args=[news_item.pk])
     before = Comment.objects.count()
     data = {'text': f'Ты {BAD_WORD}!'}
@@ -64,7 +64,7 @@ def test_bad_word_comment_not_saved(author_client, author, news_item):
     assert Comment.objects.count() == before
 
 
-def test_author_edits_own_comment_keeps_author_and_news(
+def test_author_edits_comment_author_and_news(
     author_client, author, news_item, comment
 ):
     url = reverse('news:edit', args=[comment.pk])
@@ -77,7 +77,7 @@ def test_author_edits_own_comment_keeps_author_and_news(
     assert updated.news == news_item
 
 
-def test_author_deletes_own_comment(author_client, comment):
+def test_author_deletes_comment(author_client, comment):
     url = reverse('news:delete', args=[comment.pk])
     pk = comment.pk
     response = author_client.post(url)
@@ -89,7 +89,7 @@ def test_author_deletes_own_comment(author_client, comment):
     'url_name',
     ('news:edit', 'news:delete'),
 )
-def test_other_user_cannot_touch_foreign_comment(
+def test_other_user_cannot_touch_comment(
     other_client, comment, url_name
 ):
     url = reverse(url_name, args=[comment.pk])
