@@ -4,8 +4,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from news.models import Comment, News
-
-NEWS_ON_PAGE = 10
+from yanews.settings import NEWS_COUNT_ON_HOME_PAGE
 
 
 @pytest.fixture
@@ -57,7 +56,7 @@ def many_news(db):
                 title=f'Новость {i}',
                 text='Текст тестовой новости',
             )
-            for i in range(NEWS_ON_PAGE + 1)
+            for i in range(NEWS_COUNT_ON_HOME_PAGE + 1)
         ]
     )
 
@@ -81,10 +80,45 @@ def comments_with_different_dates(db, news_item, author):
 
 
 @pytest.fixture
-def urls(news_item, comment):
+def home_url():
+    return reverse('news:home')
+
+
+@pytest.fixture
+def news_detail_url(news_item):
+    return reverse('news:detail', args=[news_item.pk])
+
+
+@pytest.fixture
+def edit_comment_url(comment):
+    return reverse('news:edit', args=[comment.pk])
+
+
+@pytest.fixture
+def delete_comment_url(comment):
+    return reverse('news:delete', args=[comment.pk])
+
+
+@pytest.fixture
+def login_url():
+    return reverse('users:login')
+
+
+@pytest.fixture
+def logout_url():
+    return reverse('users:logout')
+
+
+@pytest.fixture
+def signup_url():
+    return reverse('users:signup')
+
+
+@pytest.fixture
+def urls(home_url, news_detail_url, edit_comment_url, delete_comment_url):
     return {
-        'home': reverse('news:home'),
-        'detail': reverse('news:detail', args=[news_item.pk]),
-        'edit': reverse('news:edit', args=[comment.pk]),
-        'delete': reverse('news:delete', args=[comment.pk]),
+        'home': home_url,
+        'detail': news_detail_url,
+        'edit': edit_comment_url,
+        'delete': delete_comment_url,
     }
