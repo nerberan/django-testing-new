@@ -27,13 +27,11 @@ def test_anonym_cannot_create_comment(
 def test_author_creates_comment(
     author_client, author, news_item, news_detail_url
 ):
-    before = Comment.objects.count()
     response = author_client.post(
         news_detail_url, data={'text': NEW_COMMENT_TEXT}
     )
     assert response.status_code == HTTPStatus.FOUND
     assert response.url.endswith('#comments')
-    assert Comment.objects.count() == before + 1
     assert Comment.objects.count() == 1
     comment = Comment.objects.get()
     assert comment.text == NEW_COMMENT_TEXT
